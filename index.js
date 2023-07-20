@@ -71,6 +71,10 @@ app.get('/info', (req, res) => {
 app.get('/api/persons/:id', (req, res) => {
   const contact = findContact(req.params.id);
 
+  // Contact.findById(request.params.id).then(contact => {
+  //   response.json(contact);
+  // });
+
   if (contact) {
     res.json(contact);
   } else {
@@ -103,14 +107,14 @@ app.post('/api/persons', (req, res) => {
     })
   }
 
-  const contact = {
-    id: generateId(),
+  const contact = new Contact({
     name: body.name,
     number: body.number,
-  }
+  });
 
-  contacts = contacts.concat(contact);
-  res.json(contact);
+  contact.save().then(savedContact => {
+    res.json(savedContact);
+  });
 });
 
 const PORT = process.env.PORT;
