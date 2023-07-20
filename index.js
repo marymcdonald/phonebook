@@ -1,7 +1,9 @@
+require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const app = express();
+const Contact = require('./models/contact');
 
 morgan.token('post-data', function(req) {
   return JSON.stringify(req.body);
@@ -56,7 +58,9 @@ function verifyUniqueName(name) {
 
 
 app.get('/api/persons', (req, res) => {
-  res.json(contacts);
+  Contact.find({}).then(contacts => {
+    res.json(contacts);
+  });
 });
 
 app.get('/info', (req, res) => {
@@ -109,7 +113,7 @@ app.post('/api/persons', (req, res) => {
   res.json(contact);
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, "0.0.0.0", () => {
 	console.log(`Listening to port ${PORT}`);
 });
