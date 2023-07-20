@@ -65,7 +65,23 @@ app.get('/api/persons', (req, res) => {
 
 app.get('/info', (req, res) => {
   let date = new Date(Date.now());
-  res.send(`Phonebook has info for ${contacts.length} people.<br/><br/>${date.toString()}`);
+
+  Contact.estimatedDocumentCount().then(count => {
+    res.send(`Phonebook has info for ${count} people.<br/><br/>${date.toString()}`);
+  })
+
+});
+
+app.get('/api/persons/:id', (req, res, next) => {
+  Contact.findById(req.params.id)
+    .then(contact => {
+      if (contact) {
+        res.send(res.json(contact));
+      } else {
+        res.status(404).end();
+      }
+    })
+    .catch(error => next(error));
 });
 
 app.put('/api/persons/:id', (req, res, next) => {
@@ -79,18 +95,6 @@ app.put('/api/persons/:id', (req, res, next) => {
   Contact.findByIdAndUpdate(req.params.id, contact, { new: true })
     .then(updatedContact => {
       res.json(updatedContact);
-    })
-    .catch(error => next(error));
-});
-
-app.get('/api/persons/:id', (req, res, next) => {
-  Contact.findById(req.params.id)
-    .then(contact => {
-      if (contact) {
-        res.json(contact);
-      } else {
-        res.status(404).end();
-      }
     })
     .catch(error => next(error));
 });
