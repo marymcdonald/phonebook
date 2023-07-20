@@ -69,8 +69,6 @@ app.get('/info', (req, res) => {
 });
 
 app.put('/api/persons/:id', (req, res, next) => {
-  console.log(req.body);
-  console.log(req.params.id);
   const body = req.body;
 
   const contact = {
