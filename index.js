@@ -68,6 +68,23 @@ app.get('/info', (req, res) => {
   res.send(`Phonebook has info for ${contacts.length} people.<br/><br/>${date.toString()}`);
 });
 
+app.put('/api/persons/:id', (req, res, next) => {
+  console.log(req.body);
+  console.log(req.params.id);
+  const body = req.body;
+
+  const contact = {
+    name: body.name,
+    number: body.number
+  }
+
+  Contact.findByIdAndUpdate(req.params.id, contact, { new: true })
+    .then(updatedContact => {
+      res.json(updatedContact);
+    })
+    .catch(error => next(error));
+});
+
 app.get('/api/persons/:id', (req, res, next) => {
   Contact.findById(req.params.id)
     .then(contact => {
@@ -80,7 +97,7 @@ app.get('/api/persons/:id', (req, res, next) => {
     .catch(error => next(error));
 });
 
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res, next) => {
   Contact.findByIdAndRemove(req.params.id)
     .then(result => {
       res.status(204).end();
