@@ -68,19 +68,16 @@ app.get('/info', (req, res) => {
   res.send(`Phonebook has info for ${contacts.length} people.<br/><br/>${date.toString()}`);
 });
 
-app.get('/api/persons/:id', (req, res) => {
-  const contact = findContact(req.params.id);
-
-  // Contact.findById(request.params.id).then(contact => {
-  //   response.json(contact);
-  // });
-
-  if (contact) {
-    res.json(contact);
-  } else {
-    res.status(404).end();
-  }
-
+app.get('/api/persons/:id', (req, res, next) => {
+  Contact.findById(req.params.id)
+    .then(contact => {
+      if (contact) {
+        res.json(contact);
+      } else {
+        res.status(404).end();
+      }
+    })
+    .catch(error => next(error));
 });
 
 app.delete('/api/persons/:id', (req, res) => {
@@ -116,6 +113,17 @@ app.post('/api/persons', (req, res) => {
     res.json(savedContact);
   });
 });
+
+const errorHandler = (error, req, res, next) => {
+  console.error(error.message);
+
+  if (error.name === 'CastError') {
+    return res.status(400).send({ error: 'malformatted id'});
+  }
+  next(error);
+};
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT, "0.0.0.0", () => {
